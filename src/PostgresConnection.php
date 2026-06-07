@@ -26,6 +26,13 @@ class PostgresConnection extends BasePostgresConnection
     protected $directPdoConfig = [];
 
     /**
+     * The last retrieved PDO read / write type.
+     *
+     * @var 'read'|'write'|'direct'|null
+     */
+    protected $latestPdoTypeRetrieved = null;
+
+    /**
      * Prepare the query bindings for execution.
      *
      * @return array
@@ -65,6 +72,16 @@ class PostgresConnection extends BasePostgresConnection
     }
 
     /**
+     * Retrieve the latest read / write type used.
+     *
+     * @return 'read'|'write'|'direct'|null
+     */
+    protected function latestReadWriteTypeUsed()
+    {
+        return $this->readWriteType ?? $this->latestPdoTypeRetrieved;
+    }
+
+    /**
      * Disconnect from the underlying PDO connection.
      *
      * @return void
@@ -90,6 +107,30 @@ class PostgresConnection extends BasePostgresConnection
         }
 
         return $this->directPdo ?: $this->getPdo();
+    }
+
+    /**
+     * Get the current PDO connection.
+     *
+     * @return PDO
+     */
+    public function getPdo()
+    {
+        $this->latestPdoTypeRetrieved = 'write';
+
+        return parent::getPdo();
+    }
+
+    /**
+     * Get the current PDO connection used for reading.
+     *
+     * @return PDO
+     */
+    public function getReadPdo()
+    {
+        $this->latestPdoTypeRetrieved = 'read';
+
+        return parent::getReadPdo();
     }
 
     /**
