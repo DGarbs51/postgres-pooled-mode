@@ -28,6 +28,8 @@ abstract class TestCase extends Orchestra
             'direct' => [
                 'host' => 'direct-host',
                 'port' => '5432',
+                'username' => 'direct_user',
+                'password' => 'direct_secret',
                 'sslmode' => 'require',
             ],
         ]);

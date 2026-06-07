@@ -47,6 +47,8 @@ Add `pooled` and `direct` keys to your PostgreSQL connection:
     'direct' => array_filter([
         'host' => env('DB_DIRECT_HOST'),
         'port' => env('DB_DIRECT_PORT'),
+        'username' => env('DB_DIRECT_USERNAME'),
+        'password' => env('DB_DIRECT_PASSWORD'),
         'sslmode' => env('DB_DIRECT_SSLMODE'),
     ]),
 ],
@@ -62,8 +64,14 @@ DB_POOLED=true
 
 DB_DIRECT_HOST=your-direct-host
 DB_DIRECT_PORT=5432
+DB_DIRECT_USERNAME=your-direct-username
+DB_DIRECT_PASSWORD=your-direct-password
 DB_DIRECT_SSLMODE=require
 ```
+
+If your pooler uses the same host but differentiates pooled and direct
+connections by port and username, leave `DB_DIRECT_HOST` unset and provide only
+the direct port and username.
 
 ## What It Does
 

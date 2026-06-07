@@ -9,14 +9,16 @@ it('creates a direct aware postgres connection without opening pdo connections',
         'host' => 'pooler-host',
         'port' => '6432',
         'database' => 'laravel',
-        'username' => 'root',
-        'password' => '',
+        'username' => 'pooler-user',
+        'password' => 'pooler-password',
         'prefix' => '',
         'connect_via_database' => 'pooler_database',
         'connect_via_port' => '6432',
         'direct' => [
             'host' => 'direct-host',
             'port' => '5432',
+            'username' => 'direct-user',
+            'password' => 'direct-password',
             'sslmode' => 'require',
         ],
     ], 'pgsql');
@@ -30,11 +32,57 @@ it('creates a direct aware postgres connection without opening pdo connections',
 
     expect($directConfig['host'])->toBe('direct-host')
         ->and($directConfig['port'])->toBe('5432')
+        ->and($directConfig['username'])->toBe('direct-user')
+        ->and($directConfig['password'])->toBe('direct-password')
         ->and($directConfig['sslmode'])->toBe('require')
         ->and($directConfig['database'])->toBe('laravel')
         ->and($directConfig['options'][PDO::ATTR_EMULATE_PREPARES])->toBeFalse()
         ->and($directConfig)->not->toHaveKey('connect_via_database')
         ->and($directConfig)->not->toHaveKey('connect_via_port');
+});
+
+it('inherits base credentials for direct connections when not configured', function () {
+    $connection = (new ConnectionFactory($this->app))->make([
+        'driver' => 'pgsql',
+        'host' => 'pooler-host',
+        'port' => '6432',
+        'database' => 'laravel',
+        'username' => 'pooler-user',
+        'password' => 'pooler-password',
+        'prefix' => '',
+        'direct' => [
+            'host' => 'direct-host',
+            'port' => '5432',
+        ],
+    ], 'pgsql');
+
+    $directConfig = $connection->getDirectConfig();
+
+    expect($directConfig['username'])->toBe('pooler-user')
+        ->and($directConfig['password'])->toBe('pooler-password');
+});
+
+it('allows direct connections to override port and username without host', function () {
+    $connection = (new ConnectionFactory($this->app))->make([
+        'driver' => 'pgsql',
+        'host' => 'same-host',
+        'port' => '6432',
+        'database' => 'laravel',
+        'username' => 'pooler-user|pooler',
+        'password' => 'shared-password',
+        'prefix' => '',
+        'direct' => [
+            'port' => '5432',
+            'username' => 'direct-user',
+        ],
+    ], 'pgsql');
+
+    $directConfig = $connection->getDirectConfig();
+
+    expect($directConfig['host'])->toBe('same-host')
+        ->and($directConfig['port'])->toBe('5432')
+        ->and($directConfig['username'])->toBe('direct-user')
+        ->and($directConfig['password'])->toBe('shared-password');
 });
 
 it('preserves explicit emulated prepares options', function (?bool $baseOption, ?bool $directOption, bool $expectedPooledOption, bool $expectedDirectOption) {

@@ -26,7 +26,9 @@ it('resolves direct connection variants through the database manager', function 
         ->and($connection->getNameWithReadWriteType())->toBe('pgsql::direct')
         ->and($pdo)->toBeInstanceOf(PostgresPooledModeManagerTestPdo::class)
         ->and($pdo->config['host'])->toBe('direct-host')
-        ->and($pdo->config['port'])->toBe('5432');
+        ->and($pdo->config['port'])->toBe('5432')
+        ->and($pdo->config['username'])->toBe('direct_user')
+        ->and($pdo->config['password'])->toBe('direct_secret');
 });
 
 class PostgresPooledModeManagerTestPdo extends PDO

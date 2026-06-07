@@ -9,5 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial package release.
+- Documented and tested direct PostgreSQL connection credential overrides.
 
 [Unreleased]: https://github.com/DGarbs51/postgres-pooled-mode/compare/HEAD
